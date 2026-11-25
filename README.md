@@ -32,7 +32,7 @@ Check it worked: `select count(*) from quiz.questions;` should return 10.
 ### 3. Prepare the question bank
 The answer key is deliberately **not committed** (`supabase/seed_questions.sql` is git-ignored) because the repo is
 public. Copy `supabase/seed_questions.template.sql` to `supabase/seed_questions.sql`, write your questions and run it.
-The organiser's copy of the 10 Bob questions was generated alongside this repo. Question 3 (starting Bobcoin budget) follows the Bob documentation:
+The organiser keeps the real 10-question file (and the e2e tests) in a separate private folder, `bob-quiz-portal-private/`. Question 3 (starting Bobcoin budget) follows the Bob documentation:
 Tier 1 = 500 Bobcoins per month. If your environment grants a different amount, change the option text and the
 `correct` value, then re-run the file (it updates questions in place).
 
