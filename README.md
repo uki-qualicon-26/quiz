@@ -93,13 +93,6 @@ For 190 participants the load is small: roughly 40 leaderboard requests per seco
 Supabase free tier. Free projects pause after a week of inactivity, so open the dashboard the day before to confirm
 the project is awake.
 
-## Local end-to-end test (optional)
-
-`tests/e2e/` contains a Playwright test that drives the real UI against a local Postgres through a stand-in for the
-Supabase REST endpoint. It needs a local Postgres on port 55432 with `schema.sql` and `seed_questions.sql` loaded,
-roles `anon` and `authenticated` created, `quiz_seconds` set to 25, and `npm i playwright pg`.
-Start `node tests/e2e/server.js`, then run `node tests/e2e/run.js`.
-
 ## Files
 
 | Path | Purpose |

@@ -10,3 +10,6 @@ node_modules/
 
 # The answer key stays out of the public repo so participants cannot look it up.
 supabase/seed_questions.sql
+
+# E2E tests contain the answer key; kept outside the public repo.
+tests/
