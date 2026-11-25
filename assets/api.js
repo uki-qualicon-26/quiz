@@ -33,13 +33,13 @@
     if (!isConfigured()) { return Promise.reject(QuizError("not_configured")); }
     var ctrl = new AbortController();
     var timer = setTimeout(function () { ctrl.abort(); }, 15000);
+    var headers = { "Content-Type": "application/json", "apikey": cfg.SUPABASE_ANON_KEY };
+    // Legacy anon keys are JWTs and may be sent as a bearer token. New sb_publishable_ keys are not JWTs
+    // and must only be sent in the apikey header.
+    if (cfg.SUPABASE_ANON_KEY.indexOf("eyJ") === 0) { headers.Authorization = "Bearer " + cfg.SUPABASE_ANON_KEY; }
     return fetch(cfg.SUPABASE_URL.replace(/\/$/, "") + "/rest/v1/rpc/" + name, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": cfg.SUPABASE_ANON_KEY,
-        "Authorization": "Bearer " + cfg.SUPABASE_ANON_KEY
-      },
+      headers: headers,
       body: JSON.stringify(args || {}),
       signal: ctrl.signal
     }).then(function (res) {
