@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://*.supabase.co; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Bob Quiz Challenge</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">🤖</span>
+    <div><h1>Bob Quiz Challenge</h1><div class="muted small">Fast, accurate and on the podium</div></div>
+  </div>
+
+  <div id="error" class="error hidden" role="alert"></div>
+
+  <!-- 1. Register -->
+  <section id="view-register" class="card hidden">
+    <h2>Register to play</h2>
+    <p class="muted">Enter your name and IBM email. You get <b id="reg-total">10</b> questions and
+      <b id="reg-time">2:00</b> on the clock. Score first, speed breaks ties. One attempt per person.</p>
+    <form id="reg-form" novalidate>
+      <label for="name">Your name</label>
+      <input id="name" type="text" autocomplete="name" maxlength="60" required>
+      <label for="email">IBM email</label>
+      <input id="email" type="email" autocomplete="email" maxlength="254" placeholder="you@ibm.com" required>
+      <p class="small muted">Your email is used only to prevent duplicate entries and for event reporting. It is never shown on the leaderboard.</p>
+      <button id="reg-btn" class="btn big" type="submit">Register</button>
+    </form>
+  </section>
+
+  <!-- 2. Ready -->
+  <section id="view-ready" class="card hidden">
+    <h2>Ready, <span id="ready-name"></span>?</h2>
+    <ul class="rules">
+      <li>The clock starts the moment you press Start and cannot be paused.</li>
+      <li>Questions marked <b>Select one</b> allow a single answer. <b>Select all that apply</b> needs every correct option, with no extras.</li>
+      <li>Your timer keeps running if you refresh the page, so stay on this tab.</li>
+      <li>If time runs out, your current answers are submitted automatically.</li>
+    </ul>
+    <p><button id="start-btn" class="btn big" type="button">Start the quiz</button></p>
+  </section>
+
+  <!-- 3. Quiz -->
+  <section id="view-quiz" class="hidden">
+    <div class="timerbar">
+      <div class="timerline"><span id="progress">0 of 10 answered</span><span id="clock" class="clock" aria-live="off">2:00</span></div>
+      <div class="track"><div id="fill" class="fill"></div></div>
+    </div>
+    <div id="questions"></div>
+    <div class="sticky-submit"><button id="submit-btn" class="btn big" type="button">Submit answers</button></div>
+  </section>
+
+  <!-- 4. Results -->
+  <section id="view-result" class="hidden">
+    <div class="card scorebox">
+      <div class="muted">Your result</div>
+      <div class="scorebig"><span id="res-score">0</span><small> / <span id="res-total">10</span></small></div>
+      <div id="res-msg" class="verdict"></div>
+      <div class="stats">
+        <span class="pill">Rank <b id="res-rank">-</b></span>
+        <span class="pill">Time <b id="res-time">-</b></span>
+      </div>
+    </div>
+    <div class="card"><h2>Leaderboard</h2><div id="lb-wrap"></div>
+      <p class="small muted">Updates every few seconds. Join the big screen for the podium ceremony.</p></div>
+    <h2>Review your answers</h2>
+    <div id="review"></div>
+  </section>
+</div>
+<script src="config.js"></script>
+<script src="assets/api.js"></script>
+<script src="assets/podium.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+:root {
+  --bg: #0f1115; --surface: #181b22; --surface2: #20242d; --border: #2c313c;
+  --text: #f2f4f8; --muted: #9aa3b2; --accent: #4589ff; --accent2: #8a3ffc;
+  --ok: #24a148; --okbg: #12301e; --bad: #fa4d56; --badbg: #3a1619; --gold: #f1c21b;
+  --radius: 12px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.55 -apple-system, "Segoe UI", system-ui, sans-serif; }
+body { min-height: 100vh; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 20px 16px 60px; }
+.wrap.wide { max-width: 1100px; }
+h1 { font-size: 1.7rem; margin: 0 0 4px; }
+h2 { font-size: 1.25rem; margin: 0 0 12px; }
+.muted { color: var(--muted); }
+.small { font-size: .85rem; }
+.hidden { display: none !important; }
+.brand { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.brand .logo { font-size: 1.8rem; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px; margin-bottom: 16px; }
+label { display: block; font-weight: 600; margin: 14px 0 6px; }
+input[type=text], input[type=email] { width: 100%; padding: 12px 14px; font-size: 1rem; color: var(--text);
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; }
+input:focus-visible, button:focus-visible, .opt:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn { display: inline-block; padding: 12px 22px; font-size: 1rem; font-weight: 600; border: 0;
+  border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer; }
+.btn:hover { filter: brightness(1.1); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn.secondary { background: var(--surface2); border: 1px solid var(--border); }
+.btn.big { padding: 16px 30px; font-size: 1.15rem; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.row.between { justify-content: space-between; }
+.error { background: var(--badbg); border: 1px solid var(--bad); color: #ffd7d9; padding: 10px 12px;
+  border-radius: 8px; margin-top: 12px; }
+.rules { margin: 8px 0 0; padding-left: 20px; }
+
+/* timer */
+.timerbar { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 10px 0 12px; }
+.timerline { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+.clock { font-variant-numeric: tabular-nums; font-size: 1.4rem; }
+.clock.low { color: var(--bad); animation: pulse 1s infinite; }
+.track { height: 8px; background: var(--surface2); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+.fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .25s linear; }
+.fill.low { background: var(--bad); }
+@keyframes pulse { 50% { opacity: .55; } }
+
+/* questions */
+.qcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px; margin-bottom: 14px; }
+.qhead { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin-bottom: 10px; }
+.qnum { color: var(--accent); font-weight: 700; }
+.qprompt { font-weight: 600; margin: 0; flex: 1 1 100%; }
+.badge { font-size: .75rem; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--border); color: var(--muted); }
+.badge.multi { color: var(--gold); border-color: var(--gold); }
+.opts { display: grid; gap: 8px; }
+.opt { display: flex; gap: 12px; align-items: flex-start; padding: 11px 12px; border: 1px solid var(--border);
+  border-radius: 10px; background: var(--surface2); cursor: pointer; }
+.opt:hover { border-color: var(--accent); }
+.opt.picked { border-color: var(--accent); background: #16294d; }
+.opt input { margin-top: 4px; accent-color: var(--accent); width: 18px; height: 18px; flex: none; }
+.opt .key { font-weight: 700; color: var(--muted); text-transform: uppercase; width: 1.1em; flex: none; }
+.opt.right { border-color: var(--ok); background: var(--okbg); }
+.opt.wrong { border-color: var(--bad); background: var(--badbg); }
+.opt.missed { border-style: dashed; border-color: var(--ok); }
+.opt.locked { cursor: default; }
+.tag { margin-left: auto; font-size: .75rem; font-weight: 700; flex: none; }
+.tag.ok { color: #6fdc8c; } .tag.bad { color: #ff8389; }
+.explain { margin-top: 10px; padding: 10px 12px; border-left: 3px solid var(--accent); background: var(--surface2);
+  border-radius: 6px; font-size: .92rem; }
+.verdict { font-weight: 700; }
+.verdict.ok { color: #6fdc8c; } .verdict.bad { color: #ff8389; }
+.sticky-submit { position: sticky; bottom: 0; background: linear-gradient(transparent, var(--bg) 40%); padding: 18px 0 8px; }
+
+/* score */
+.scorebox { text-align: center; padding: 26px 16px; }
+.scorebig { font-size: 3.4rem; font-weight: 800; line-height: 1.1; }
+.scorebig small { font-size: 1.4rem; color: var(--muted); }
+.stats { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+.pill { padding: 6px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; font-size: .9rem; }
+
+/* leaderboard */
+.lb { width: 100%; border-collapse: collapse; }
+.lb th, .lb td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); }
+.lb th { color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+.lb td.num, .lb th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.lb tr.me td { background: #16294d; font-weight: 700; }
+.lb .medal { font-size: 1.15rem; }
+
+/* podium */
+.podium { display: flex; justify-content: center; align-items: flex-end; gap: 10px; min-height: 280px; padding-top: 10px; }
+.podium-step { flex: 1 1 0; max-width: 240px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+.podium-driver { padding: 0 6px 8px; min-height: 96px; }
+.podium-icon { font-size: 2.2rem; }
+.podium-name { font-weight: 800; font-size: 1.05rem; word-break: break-word; }
+.podium-score { color: var(--muted); font-size: .85rem; }
+.podium-block { width: 100%; border-radius: 10px 10px 0 0; display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; padding-top: 10px; font-weight: 800; }
+.podium-medal { font-size: 2rem; } .podium-pos { font-size: 1.3rem; }
+.p1 .podium-block { height: 190px; background: linear-gradient(#f1c21b, #b28600); color: #2b2100; }
+.p2 .podium-block { height: 140px; background: linear-gradient(#c6c6c6, #8d8d8d); color: #1f1f1f; }
+.p3 .podium-block { height: 100px; background: linear-gradient(#d28e55, #8a5a2e); color: #2a1a0b; }
+.podium-step.is-hidden { opacity: 0; transform: translateY(60px); }
+.podium-step.is-rising { animation: rise .9s cubic-bezier(.2,.9,.3,1.2) both; }
+.podium-step.is-winner .podium-icon { animation: bounce .7s ease infinite alternate; font-size: 3rem; }
+.podium-step.is-winner .podium-name { color: var(--gold); font-size: 1.35rem; }
+@keyframes rise { from { opacity: 0; transform: translateY(80px); } to { opacity: 1; transform: none; } }
+@keyframes bounce { to { transform: translateY(-10px) rotate(-6deg); } }
+
+.confetti-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+.confetti { position: absolute; will-change: transform, opacity; }
+
+/* presenter */
+.stage { text-align: center; }
+.banner { font-size: clamp(1.4rem, 3.4vw, 2.4rem); font-weight: 800; min-height: 1.4em; margin: 6px 0 14px; }
+.counters { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.counter { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 18px; min-width: 130px; }
+.counter b { display: block; font-size: 1.9rem; }
+.presenter-podium .podium { min-height: 380px; }
+.presenter-podium .podium-name { font-size: 1.5rem; }
+.presenter-podium .p1 .podium-block { height: 250px; }
+.presenter-podium .p2 .podium-block { height: 180px; }
+.presenter-podium .p3 .podium-block { height: 130px; }
+
+@media (max-width: 520px) {
+  .podium-name { font-size: .9rem; } .podium-icon { font-size: 1.6rem; }
+  .scorebig { font-size: 2.8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .podium-step.is-hidden { opacity: 0; }
+}
+
+.row.center { justify-content: center; }
+.mb { margin-bottom: 14px; }
+.mt { margin-top: 18px; }
+.left { text-align: left; }

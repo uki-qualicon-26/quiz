@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://*.supabase.co; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex">
+  <title>Bob Quiz - Big Screen</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<div class="confetti-layer" id="layer" aria-hidden="true"></div>
+<div class="wrap wide stage">
+  <h1>🤖 Bob Quiz Challenge - Live</h1>
+  <div class="counters" aria-live="polite">
+    <div class="counter"><b id="c-reg">0</b><span class="muted">registered</span></div>
+    <div class="counter"><b id="c-start">0</b><span class="muted">playing or done</span></div>
+    <div class="counter"><b id="c-done">0</b><span class="muted">finished</span></div>
+  </div>
+
+  <div id="banner" class="banner">Live standings</div>
+  <div class="row center mb">
+    <button id="btn-ceremony" class="btn big" type="button">🍾 Start podium ceremony</button>
+    <button id="btn-live" class="btn secondary" type="button">Back to live board</button>
+  </div>
+  <p id="err" class="error hidden" role="alert"></p>
+
+  <div id="podium" class="presenter-podium"></div>
+
+  <div class="card left mt">
+    <h2>Top 10</h2>
+    <div id="lb-wrap"></div>
+  </div>
+</div>
+<script src="config.js"></script>
+<script src="assets/api.js"></script>
+<script src="assets/podium.js"></script>
+<script src="assets/presenter.js"></script>
+</body>
+</html>
