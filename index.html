@@ -6,15 +6,15 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://*.supabase.co; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <title>Bob Quiz Challenge</title>
-  <link rel="icon" type="image/png" href="assets/favicon.png?v=202611261022">
-  <link rel="stylesheet" href="assets/styles.css?v=202611261022">
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=202611261103">
+  <link rel="stylesheet" href="assets/styles.css?v=202611261103">
 </head>
 <body>
 <div class="wrap">
   <div class="brand">
-    <img class="logo-img" src="assets/bob-logo.png?v=202611261022" alt="IBM Bob" width="56" height="56">
+    <img class="logo-img" src="assets/bob-logo.png?v=202611261103" alt="IBM Bob" width="56" height="56">
     <div><h1>Bob Quiz Challenge</h1><div class="muted small">Fast, accurate and on the podium</div></div>
-    <img class="badge-img" src="assets/qualicon-badge.svg?v=202611261022" alt="Qualicon 2026" width="84" height="84">
+    <img class="badge-img" src="assets/qualicon-badge.svg?v=202611261103" alt="Qualicon 2026" width="84" height="84">
   </div>
 
   <div id="error" class="error hidden" role="alert"></div>
@@ -57,7 +57,10 @@
       <div class="track"><div id="fill" class="fill"></div></div>
     </div>
     <div id="questions"></div>
-    <div class="sticky-submit"><button id="submit-btn" class="btn big" type="button">Submit answers</button></div>
+    <div class="submit-area">
+      <p id="submit-hint" class="muted">Answer every question to unlock the Submit button here.</p>
+      <button id="submit-btn" class="btn big hidden" type="button">Submit all answers</button>
+    </div>
   </section>
 
   <!-- 4. Results -->
@@ -79,9 +82,9 @@
     <div id="review"></div>
   </section>
 </div>
-<script src="config.js?v=202611261022"></script>
-<script src="assets/api.js?v=202611261022"></script>
-<script src="assets/podium.js?v=202611261022"></script>
-<script src="assets/app.js?v=202611261022"></script>
+<script src="config.js?v=202611261103"></script>
+<script src="assets/api.js?v=202611261103"></script>
+<script src="assets/podium.js?v=202611261103"></script>
+<script src="assets/app.js?v=202611261103"></script>
 </body>
 </html>

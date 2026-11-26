@@ -135,7 +135,11 @@
     return state.questions.filter(function (q) { return (state.answers[q.id] || []).length > 0; }).length;
   }
   function updateProgress() {
-    $("progress").textContent = answeredCount() + " of " + state.questions.length + " answered";
+    var done = answeredCount();
+    var all = state.questions.length > 0 && done === state.questions.length;
+    $("progress").textContent = done + " of " + state.questions.length + " answered";
+    $("submit-btn").classList.toggle("hidden", !all);
+    $("submit-hint").classList.toggle("hidden", all);
   }
 
   function tick() {
@@ -163,6 +167,8 @@
     window.QuizApi.submit(state.token, payload).then(renderResult).catch(function (e) {
       state.submitting = false;
       $("submit-btn").disabled = false;
+      $("submit-btn").classList.remove("hidden");   // always allow a retry, even with unanswered questions
+      $("submit-hint").classList.add("hidden");
       if (sessionExpired(e)) { return; }
       showError(e.message + " Press Submit to retry.");
     });

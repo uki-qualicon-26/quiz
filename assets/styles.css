@@ -192,3 +192,7 @@ input:focus-visible, button:focus-visible, .opt:focus-within { outline: 3px soli
 .banner { text-shadow: 0 0 16px rgba(61, 230, 255, .6); }
 .error { background: rgba(90, 20, 36, .92); }
 @media (max-width: 520px) { .badge-img { width: 64px; height: 64px; } }
+
+/* Submit sits once at the end of the last question, not floating over the quiz */
+.submit-area { text-align: center; padding: 8px 0 40px; }
+.submit-area .btn { min-width: 260px; }
