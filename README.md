@@ -42,10 +42,10 @@ In Supabase go to **Project Settings > API** and copy the **Project URL** and th
 
 ### 5. Publish on GitHub Pages
 Repo **Settings > Pages**: Source = *Deploy from a branch*, Branch = `main`, folder = `/ (root)`.
-After a minute the site is live at `https://<your-user>.github.io/<repo-name>/`.
+After a minute the site is live. For this event it is hosted in the `uki-qualicon-26` GitHub organization.
 
-- Participants: `.../index.html`
-- Big screen: `.../presenter.html`
+- Participants: https://uki-qualicon-26.github.io/quiz/
+- Big screen: https://uki-qualicon-26.github.io/quiz/presenter.html
 
 ### 6. Dry run, then reset
 Take the quiz yourself with two or three colleagues, check the podium ceremony, then wipe the test data:
