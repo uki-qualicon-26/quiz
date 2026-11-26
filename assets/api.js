@@ -14,6 +14,8 @@
     not_started: "The quiz has not been started yet.",
     not_submitted: "You have not submitted the quiz yet.",
     invalid_answers: "Your answers could not be read. Please try again.",
+    quiz_not_done: "Finish the quiz first. The hands-on workshop unlocks when you have submitted it.",
+    invalid_progress: "Your progress could not be saved. Please try again.",
     network: "Could not reach the quiz server. Check your connection and try again.",
     not_configured: "This portal is not configured yet (see README, step 4).",
     unknown: "Something went wrong. Please try again."
@@ -58,8 +60,26 @@
             function (e) { clearTimeout(timer); throw e; });
   }
 
+  // One session shared by the hub, the quiz and the workshop (same origin, same key).
+  var SESSION_KEY = "bobquiz.session.v1";
+  var session = {
+    get: function () {
+      try { var s = JSON.parse(localStorage.getItem(SESSION_KEY) || "null"); return s && s.token ? s : null; }
+      catch (e) { return null; }
+    },
+    set: function (token, name) {
+      try { localStorage.setItem(SESSION_KEY, JSON.stringify({ token: token, name: name })); } catch (e) { /* storage blocked */ }
+    },
+    clear: function () { try { localStorage.removeItem(SESSION_KEY); } catch (e) { /* ignore */ } }
+  };
+
   window.QuizApi = {
     isConfigured: isConfigured,
+    session:     session,
+    workshopGet:  function (token)          { return rpc("workshop_get", { p_token: token }); },
+    workshopSave: function (token, path, done, finished) {
+      return rpc("workshop_save", { p_token: token, p_path: path, p_done: done, p_finished: !!finished });
+    },
     config:      function ()               { return rpc("quiz_config"); },
     register:    function (name, email, hostCode) {
       var args = { p_name: name, p_email: email };

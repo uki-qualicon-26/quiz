@@ -26,10 +26,10 @@
     s = Math.max(0, Math.ceil(s));
     return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
   }
-  function save(obj) { try { sessionStorage.setItem(KEY, JSON.stringify(obj)); } catch (e) { /* ignore */ } }
+  function save(obj) { try { localStorage.setItem(KEY, JSON.stringify(obj)); } catch (e) { /* ignore */ } }
   function saveAnswers() { save({ token: state.token, name: state.name, answers: state.answers }); }
-  function load() { try { return JSON.parse(sessionStorage.getItem(KEY) || "null"); } catch (e) { return null; } }
-  function clearSession() { try { sessionStorage.removeItem(KEY); } catch (e) { /* ignore */ } }
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { return null; } }
+  function clearSession() { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } }
   function sessionExpired(err) {
     if (err && err.code === "invalid_token") { clearSession(); state.token = null; init(); return true; }
     return false;

@@ -217,3 +217,8 @@ input:focus-visible, button:focus-visible, .opt:focus-within { outline: 3px soli
 /* Participant header: centre the title and tagline between the two logos */
 .brand { justify-content: center; }
 .brand > div { text-align: center; }
+
+/* Links styled as buttons, and the workshop hand-off card */
+a.btn { text-decoration: none; text-align: center; }
+.next-card { text-align: center; }
+.next-card .row { justify-content: center; margin-top: 12px; }

@@ -121,3 +121,7 @@ The host can retake the quiz any number of times without affecting the leaderboa
 
 Host runs are flagged `is_test` and are excluded from `quiz_leaderboard`, `quiz_stats` and all `quiz.v_*` reporting views.
 Disable host mode with `delete from quiz.config where key = 'host_code';`.
+
+## Home page and workshop
+
+Participants now arrive at the home page, https://uki-qualicon-26.github.io/ (repo `uki-qualicon-26/uki-qualicon-26.github.io`), register once, take this quiz, and the hands-on workshop (`/workshop/`) unlocks when the quiz is submitted. The session is shared through `localStorage`, so the quiz recognises the home-page registration. `supabase/schema.sql` also holds the workshop tables and the `workshop_get` / `workshop_save` functions, and `supabase/stakeholder_report.sql` has sections 8 to 13 for the workshop.

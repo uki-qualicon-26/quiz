@@ -429,7 +429,79 @@ end;
 $$;
 
 -- -----------------------------------------------------------------------------
--- Privileges: the browser (anon) may only execute the quiz_* functions.
+-- Hands-on workshop tracking. One registration (the quiz one) covers both parts.
+-- The workshop only accepts progress from people who have submitted the quiz.
+-- -----------------------------------------------------------------------------
+create table if not exists quiz.workshop_progress (
+  participant_id uuid primary key references quiz.participants (id) on delete cascade,
+  path           text check (path in ('A', 'B')),
+  done           text[] not null default '{}',
+  started_at     timestamptz not null default now(),
+  updated_at     timestamptz not null default now(),
+  finished_at    timestamptz
+);
+alter table quiz.workshop_progress enable row level security;
+
+-- Where is this person? Used by the hub and the workshop guide on every page load.
+create or replace function public.workshop_get(p_token text)
+returns jsonb language plpgsql stable security definer
+set search_path = quiz, pg_temp as
+$$
+declare
+  v_pid uuid := quiz.token_to_participant(p_token);
+  v_att quiz.attempts;
+  v_w   quiz.workshop_progress;
+begin
+  if v_pid is null then raise exception 'invalid_token'; end if;
+  select * into v_att from quiz.attempts where participant_id = v_pid;
+  select * into v_w   from quiz.workshop_progress where participant_id = v_pid;
+  return jsonb_build_object(
+    'name',        (select name from quiz.participants where id = v_pid),
+    'quiz_state',  case when v_att.participant_id is null then 'registered'
+                        when v_att.submitted_at is null   then 'in_progress'
+                        else 'submitted' end,
+    'path',        v_w.path,
+    'done',        to_jsonb(coalesce(v_w.done, '{}'::text[])),
+    'started_at',  v_w.started_at,
+    'finished_at', v_w.finished_at);
+end;
+$$;
+
+-- Save workshop progress. Rejects anyone who has not submitted the quiz.
+create or replace function public.workshop_save(p_token text, p_path text, p_done jsonb, p_finished boolean)
+returns jsonb language plpgsql volatile security definer
+set search_path = quiz, pg_temp as
+$$
+declare
+  v_pid  uuid := quiz.token_to_participant(p_token);
+  v_done text[];
+begin
+  if v_pid is null then raise exception 'invalid_token'; end if;
+  if not exists (select 1 from quiz.attempts where participant_id = v_pid and submitted_at is not null) then
+    raise exception 'quiz_not_done';
+  end if;
+  if p_path is not null and p_path not in ('A', 'B') then raise exception 'invalid_progress'; end if;
+  if p_done is null or jsonb_typeof(p_done) <> 'array' or jsonb_array_length(p_done) > 20 then
+    raise exception 'invalid_progress';
+  end if;
+  -- Only well-formed step ids (s1 .. s99), de-duplicated.
+  select coalesce(array_agg(distinct x order by x), '{}') into v_done
+  from jsonb_array_elements_text(p_done) x
+  where x ~ '^s[0-9]{1,2}$';
+
+  insert into quiz.workshop_progress as w (participant_id, path, done, finished_at)
+  values (v_pid, p_path, v_done, case when p_finished then now() end)
+  on conflict (participant_id) do update
+    set path        = excluded.path,
+        done        = excluded.done,
+        updated_at  = now(),
+        finished_at = case when p_finished then coalesce(w.finished_at, now()) else null end;
+  return jsonb_build_object('saved', true);
+end;
+$$;
+
+-- -----------------------------------------------------------------------------
+-- Privileges: the browser (anon) may only execute the quiz_* and workshop_* functions.
 -- -----------------------------------------------------------------------------
 do $$
 declare f text;
@@ -437,7 +509,8 @@ begin
   foreach f in array array[
     'quiz_config()', 'quiz_register(text,text,text)', 'quiz_status(text)', 'quiz_start(text)',
     'quiz_submit(text,jsonb)', 'quiz_result(text)', 'quiz_leaderboard(int)', 'quiz_stats()',
-    'quiz_host_reset(text,text)'
+    'quiz_host_reset(text,text)',
+    'workshop_get(text)', 'workshop_save(text,text,jsonb,boolean)'
   ] loop
     execute format('revoke all on function public.%s from public', f);
     execute format('grant execute on function public.%s to anon, authenticated', f);
@@ -490,3 +563,13 @@ from quiz.attempts a
 join quiz.participants p on p.id = a.participant_id
 where a.submitted_at is null and not p.is_test
 order by a.started_at;
+
+-- Workshop progress of real participants only (host test runs excluded), with the quiz result alongside.
+create or replace view quiz.v_workshop_real as
+select p.id as participant_id, p.name, p.email, w.path, cardinality(w.done) as steps_done, w.done,
+       w.started_at, w.updated_at, w.finished_at,
+       a.score as quiz_score, a.total as quiz_total
+from quiz.workshop_progress w
+join quiz.participants p on p.id = w.participant_id
+left join quiz.attempts a on a.participant_id = p.id
+where not p.is_test;
