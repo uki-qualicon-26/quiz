@@ -10,6 +10,7 @@ The host code and the Supabase keys are shared privately and never written here.
 | Participants | https://uki-qualicon-26.github.io/quiz/ |
 | Big screen (projector) | https://uki-qualicon-26.github.io/quiz/presenter.html |
 | Host test mode (hosts only) | https://uki-qualicon-26.github.io/quiz/?host=1 |
+| Clear trial data (you only, never share) | https://uki-qualicon-26.github.io/quiz/host.html |
 | Database (hosts only) | Supabase dashboard, project `bob-quiz`, **SQL Editor** |
 
 ## 2. What to tell participants
