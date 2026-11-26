@@ -112,8 +112,8 @@ Run in **SQL Editor**. Change these before the event, not while people are playi
 
 | Situation | What to do |
 |---|---|
-| Remove all test and dry-run data before the live session | Easiest: open https://uki-qualicon-26.github.io/quiz/presenter.html?host=1, enter the host code and press **Clear all trial data**. Or in SQL: `truncate quiz.participants cascade;` |
-| Protect the leaderboard once the quiz is live | On the same host panel press **Go live (lock clearing)**. Clearing is refused until you press **Unlock clearing** |
+| Remove all test and dry-run data before the live session | Easiest: open your private page https://uki-qualicon-26.github.io/quiz/host.html, enter the host code and press **Clear all trial data**. Or in SQL: `truncate quiz.participants cascade;` |
+| Protect the leaderboard once the quiz is live | On the same private page press **Go live (lock clearing)**. Clearing is refused until you press **Unlock clearing** |
 | A participant mistyped their email or needs another attempt | `delete from quiz.participants where email = 'person@ibm.com';` They can then register again. |
 | See who has registered | `select name, email, created_at, is_test from quiz.participants order by created_at;` |
 | A participant says "This email has already completed the quiz" | That email already has a result. Delete it with the line above only if you intend to give them another go. |
@@ -135,10 +135,14 @@ Run in **SQL Editor**. Change these before the event, not while people are playi
 The portal uses a Qualicon 2026 synthwave theme: a neon night-sky background and a Qualicon 2026 badge with the bug next to the IBM Bob logo. The artwork is in `assets/qualicon-bg.svg` and `assets/qualicon-badge.svg`. Replace the badge file with the official artwork if you have it, keeping the same file name.
 
 
-## Clearing trial runs from the big screen
+## Clearing trial runs (private host page)
 
-1. Open `presenter.html?host=1` (the normal big-screen link has no host controls, so the audience cannot see them).
-2. Type the host code and press **Clear all trial data**, then confirm. Every participant, result and leaderboard row is deleted, and the counters return to 0.
-3. When the real session starts, press **Go live (lock clearing)**. From then on clearing is refused, even with the correct code, until you press **Unlock clearing**.
+The big-screen page (`presenter.html`) has **no** host controls, so it is safe to project and share. The controls live on a separate page that you keep to yourself:
 
-Note: this deletes everyone, including any real participants, so do it only before the live session. Participants who are mid-quiz when you clear will see "session expired".
+`https://uki-qualicon-26.github.io/quiz/host.html`
+
+1. Before the live session, open `host.html` on your own laptop, type the host code and press **Clear all trial data**, then confirm. Every participant, result and leaderboard row is deleted, and the big-screen counters return to 0.
+2. Press **Go live (lock clearing)**. From then on clearing is refused, even with the correct code, until you press **Unlock clearing**.
+3. Project `presenter.html` for the audience.
+
+The page is not linked from anywhere and is marked noindex, but the real protection is the host code: without it nothing can be cleared. Clearing deletes everyone, including real participants, so do it only before the live session. Anyone mid-quiz when you clear will see "session expired".

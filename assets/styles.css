@@ -198,5 +198,5 @@ input:focus-visible, button:focus-visible, .opt:focus-within { outline: 3px soli
 .submit-area .btn { min-width: 260px; }
 
 /* Host controls on the big screen (presenter.html?host=1) */
-#host-panel input { width: 220px; }
+#host-panel input { max-width: 320px; }
 #host-panel .btn { white-space: nowrap; }

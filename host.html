@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://*.supabase.co; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Bob Quiz - Host controls</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="host-panel">
+    <h1>Host controls (private)</h1>
+    <p class="muted">Keep this page to yourself. Share <b>presenter.html</b> with the audience instead.</p>
+    <label for="host-code">Host code</label>
+    <input id="host-code" type="password" autocomplete="off" placeholder="Host code">
+    <div class="row mt">
+      <button id="btn-clear" class="btn secondary" type="button">Clear all trial data</button>
+      <button id="btn-lock" class="btn secondary" type="button">Go live (lock clearing)</button>
+      <button id="btn-unlock" class="btn secondary" type="button">Unlock clearing</button>
+    </div>
+    <p id="host-msg" class="muted" role="status"></p>
+    <p class="muted">Clearing deletes every participant, result and leaderboard row. Use it before the live session, then press Go live.</p>
+  </div>
+</div>
+<script src="config.js"></script>
+<script src="assets/api.js"></script>
+<script src="assets/host.js"></script>
+</body>
+</html>
