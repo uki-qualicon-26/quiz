@@ -127,7 +127,7 @@ Run in **SQL Editor**. Change these before the event, not while people are playi
 - To change questions, edit your private `seed_questions.sql` and run it in the SQL Editor. It updates questions in place. `supabase/seed_questions.template.sql` shows the format.
 - Question 3 uses the documented Tier 1 allowance of 500 Bobcoins per month. If you want a different figure, change that question's option text and `correct` value, then re-run the file.
 - Built-in modes are Agent, Plan and Ask. Advanced is not a default mode.
-- Questions 7 to 10 cover **Bobalytics** (where to open it, the Bob factor, the three KPIs, and anonymized team charts). Questions 11 and 12 cover **pricing** (which plan includes Bobalytics and the admin dashboard, and the 30-day free trial). They follow the Bob documentation and the public page https://bob.ibm.com/pricing. Prices and Bobcoin allowances on that page are indicative and vary by country, so the quiz asks about plan features and trial length and not about prices.
+- Questions 7 to 9 cover **Bobalytics** (where to open it, the Bob factor and the three KPIs). Questions 10 to 12 cover choosing the right mode (Ask, Plan) and where MCP configuration is stored. They follow the Bob documentation. There are no pricing questions in this set. The earlier pricing questions (which plan includes Bobalytics, and the 30-day free trial, from https://bob.ibm.com/pricing) can be added back by editing your private `seed_questions.sql`.
 
 ## 11. Look and feel
 
