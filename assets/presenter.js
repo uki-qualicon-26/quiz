@@ -41,7 +41,7 @@
     Promise.all([window.QuizApi.stats(), window.QuizApi.leaderboard(10)]).then(function (res) {
       showErr("");
       $("c-reg").textContent = res[0].registered;
-      $("c-start").textContent = res[0].started;
+      $("c-start").textContent = Math.max(0, res[0].started - res[0].completed);
       $("c-done").textContent = res[0].completed;
       rows = res[1];
       renderTable(rows);
