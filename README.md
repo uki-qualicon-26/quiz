@@ -103,3 +103,16 @@ the project is awake.
 | `supabase/schema.sql` | Tables, scoring functions, API, reporting views |
 | `supabase/seed_questions.template.sql` | Question bank template (the real `seed_questions.sql` is git-ignored) |
 | `supabase/reports.sql` | Stakeholder queries and host controls |
+
+
+## Host test runs (not counted)
+
+The host can retake the quiz any number of times without affecting the leaderboard, the live counters or any report.
+
+1. In the Supabase SQL editor, set a secret host code (8+ characters, never commit it):
+   `insert into quiz.config (key, value) values ('host_code', 'YOUR-LONG-SECRET') on conflict (key) do update set value = excluded.value;`
+2. Open `<site URL>/?host=1`. A "Host code" field appears. Register with your name, IBM email and the code.
+3. Finish the quiz, then press **Run it again** on the result screen. Each registration resets your previous attempt.
+
+Host runs are flagged `is_test` and are excluded from `quiz_leaderboard`, `quiz_stats` and all `quiz.v_*` reporting views.
+Disable host mode with `delete from quiz.config where key = 'host_code';`.

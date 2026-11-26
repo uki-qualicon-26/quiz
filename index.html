@@ -6,13 +6,13 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://*.supabase.co; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <title>Bob Quiz Challenge</title>
-  <link rel="icon" type="image/png" href="assets/favicon.png?v=202611260638">
-  <link rel="stylesheet" href="assets/styles.css?v=202611260638">
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=202611261004">
+  <link rel="stylesheet" href="assets/styles.css?v=202611261004">
 </head>
 <body>
 <div class="wrap">
   <div class="brand">
-    <img class="logo-img" src="assets/bob-logo.png?v=202611260638" alt="IBM Bob" width="56" height="56">
+    <img class="logo-img" src="assets/bob-logo.png?v=202611261004" alt="IBM Bob" width="56" height="56">
     <div><h1>Bob Quiz Challenge</h1><div class="muted small">Fast, accurate and on the podium</div></div>
   </div>
 
@@ -28,6 +28,10 @@
       <input id="name" type="text" autocomplete="name" maxlength="60" required>
       <label for="email">IBM email</label>
       <input id="email" type="email" autocomplete="email" maxlength="254" placeholder="you@ibm.com" required>
+      <div id="host-box" class="hidden">
+        <label for="host-code">Host code (test run, not counted)</label>
+        <input id="host-code" type="password" autocomplete="off" maxlength="100">
+      </div>
       <p class="small muted">Your email is used only to prevent duplicate entries and for event reporting. It is never shown on the leaderboard.</p>
       <button id="reg-btn" class="btn big" type="submit">Register</button>
     </form>
@@ -57,6 +61,8 @@
 
   <!-- 4. Results -->
   <section id="view-result" class="hidden">
+    <div id="test-banner" class="notice hidden">Host test run. This attempt is not counted on the leaderboard or in any report.
+      <button id="retake-btn" class="btn" type="button">Run it again</button></div>
     <div class="card scorebox">
       <div class="muted">Your result</div>
       <div class="scorebig"><span id="res-score">0</span><small> / <span id="res-total">10</span></small></div>
@@ -72,9 +78,9 @@
     <div id="review"></div>
   </section>
 </div>
-<script src="config.js?v=202611260638"></script>
-<script src="assets/api.js?v=202611260638"></script>
-<script src="assets/podium.js?v=202611260638"></script>
-<script src="assets/app.js?v=202611260638"></script>
+<script src="config.js?v=202611261004"></script>
+<script src="assets/api.js?v=202611261004"></script>
+<script src="assets/podium.js?v=202611261004"></script>
+<script src="assets/app.js?v=202611261004"></script>
 </body>
 </html>

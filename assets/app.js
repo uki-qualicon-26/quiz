@@ -8,7 +8,7 @@
   var el = P.el;
 
   var state = { token: null, name: null, cfg: null, questions: [], answers: {}, endsAt: 0,
-                totalSecs: 120, timer: null, submitting: false, lbTimer: null, myRank: null };
+                totalSecs: 120, isTest: false, timer: null, submitting: false, lbTimer: null, myRank: null };
 
   /* ---------- helpers ---------- */
   function show(view) {
@@ -36,6 +36,8 @@
   }
 
   /* ---------- register ---------- */
+  // The host field only appears on <site>/?host=1; the secret code itself is checked on the server.
+  var HOST_MODE = /(^|[?&])host=1(&|$)/.test(window.location.search);
   var EMAIL_RE = /^[a-z0-9._%+'-]+@([a-z0-9-]+\.)*ibm\.com$/i;
 
   function onRegister(ev) {
@@ -46,8 +48,9 @@
     if (name.length < 2) { return showError("Please enter your full name."); }
     if (!EMAIL_RE.test(email)) { return showError("Please use your IBM email address (ending in ibm.com)."); }
     $("reg-btn").disabled = true;
-    window.QuizApi.register(name, email).then(function (r) {
-      state.token = r.token; state.name = r.name;
+    var hostCode = HOST_MODE ? $("host-code").value : "";
+    window.QuizApi.register(name, email, hostCode).then(function (r) {
+      state.token = r.token; state.name = r.name; state.isTest = !!r.is_test;
       save({ token: r.token, name: r.name });
       showReady();
     }).catch(function (e) { showError(e.message); })
@@ -174,6 +177,8 @@
   function renderResult(r) {
     state.submitting = false;
     state.myRank = r.rank;
+    state.isTest = !!r.is_test;
+    $("test-banner").classList.toggle("hidden", !state.isTest);
     $("res-score").textContent = r.score;
     $("res-total").textContent = r.total;
     $("res-rank").textContent = r.rank ? "#" + r.rank : "-";
@@ -260,9 +265,18 @@
     }).catch(function () { /* keep last board on transient errors */ });
   }
 
+  function onRetake() {
+    clearInterval(state.lbTimer);
+    clearSession();
+    state.token = null; state.answers = {}; state.isTest = false;
+    $("host-code").value = "";
+    init();
+  }
+
   /* ---------- boot ---------- */
   function init() {
     showError("");
+    $("host-box").classList.toggle("hidden", !HOST_MODE);
     if (!window.QuizApi.isConfigured()) {
       show("register");
       $("reg-btn").disabled = true;
@@ -291,6 +305,7 @@
   }
 
   $("reg-form").addEventListener("submit", onRegister);
+  $("retake-btn").addEventListener("click", onRetake);
   $("start-btn").addEventListener("click", onStart);
   $("submit-btn").addEventListener("click", function () { submit(false); });
   window.addEventListener("beforeunload", function (e) {

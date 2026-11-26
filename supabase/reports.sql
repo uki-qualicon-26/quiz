@@ -24,12 +24,13 @@ select name, email, started_at from quiz.v_unfinished;
 select p.name, p.email
 from quiz.participants p
 left join quiz.attempts a on a.participant_id = p.id
-where a.participant_id is null
+where a.participant_id is null and not p.is_test
 order by p.created_at;
 
 -- 6. Registrations over time (5-minute buckets) to show engagement during the session
 select date_bin('5 minutes', created_at, timestamptz '2000-01-01') as bucket, count(*) as registrations
 from quiz.participants
+where not is_test
 group by 1
 order by 1;
 
@@ -44,5 +45,11 @@ order by 1;
 --   update quiz.config set value = 'false' where key = 'quiz_open';
 -- Hide the answer key in the review screen until you are ready to share it:
 --   update quiz.config set value = 'false' where key = 'reveal_answers';
+-- Host test runs: set a secret host code once (8+ characters, never put it in the repo), then register on
+-- <site URL>/?host=1 with that code. Those runs can be repeated any number of times and are excluded from
+-- the leaderboard, the live counters and every report above.
+--   insert into quiz.config (key, value) values ('host_code', 'CHOOSE-A-LONG-SECRET')
+--     on conflict (key) do update set value = excluded.value;
+-- Disable host mode:  delete from quiz.config where key = 'host_code';
 -- Wipe all participants and results between dry run and the live event:
 --   truncate quiz.participants cascade;

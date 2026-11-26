@@ -52,6 +52,8 @@ create table if not exists quiz.participants (
   token_hash text not null,
   created_at timestamptz not null default now()
 );
+-- Host test runs (retakeable, excluded from the leaderboard, counters and reports)
+alter table quiz.participants add column if not exists is_test boolean not null default false;
 
 create table if not exists quiz.attempts (
   participant_id uuid primary key references quiz.participants (id) on delete cascade,
@@ -118,7 +120,8 @@ select row_number() over (order by a.score desc, a.duration_ms asc, a.submitted_
        a.submitted_at
 from quiz.attempts a
 join quiz.participants p on p.id = a.participant_id
-where a.submitted_at is not null;
+where a.submitted_at is not null
+  and not p.is_test;
 
 -- Full result (score, rank, per-question review) for one participant.
 create or replace function quiz.build_result(p_pid uuid)
@@ -130,8 +133,10 @@ declare
   v_rank   int;
   v_reveal boolean := coalesce(quiz.cfg('reveal_answers'), 'true') = 'true';
   v_review jsonb;
+  v_test   boolean;
 begin
   select * into v_att from quiz.attempts where participant_id = p_pid;
+  select is_test into v_test from quiz.participants where id = p_pid;
   select l.rank into v_rank from quiz.v_leaderboard l where l.participant_id = p_pid;
 
   select jsonb_agg(jsonb_build_object(
@@ -153,6 +158,7 @@ begin
     'duration_ms', v_att.duration_ms,
     'late',        v_att.late,
     'rank',        v_rank,
+    'is_test',     coalesce(v_test, false),
     'review',      v_review
   );
 end;
@@ -176,7 +182,10 @@ $$
 $$;
 
 -- Register (or re-issue a token for someone who has not started yet).
-create or replace function public.quiz_register(p_name text, p_email text)
+-- With the secret host code the participant becomes a "test run": the attempt is reset on every
+-- registration so the host can retake the quiz, and it is never counted anywhere.
+drop function if exists public.quiz_register(text, text);
+create or replace function public.quiz_register(p_name text, p_email text, p_host_code text default null)
 returns jsonb language plpgsql security definer
 set search_path = quiz, pg_temp as
 $$
@@ -184,11 +193,10 @@ declare
   v_name  text := btrim(regexp_replace(coalesce(p_name, ''), '\s+', ' ', 'g'));
   v_email text := lower(btrim(coalesce(p_email, '')));
   v_token text := replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', '');
+  v_hash  text := encode(sha256(convert_to(v_token, 'utf8')), 'hex');
+  v_host  text := coalesce(quiz.cfg('host_code'), '');
   v_id    uuid;
 begin
-  if coalesce(quiz.cfg('quiz_open'), 'true') <> 'true' then
-    raise exception 'quiz_closed';
-  end if;
   if char_length(v_name) < 2 or char_length(v_name) > 60 then
     raise exception 'invalid_name';
   end if;
@@ -196,18 +204,37 @@ begin
     raise exception 'invalid_email';
   end if;
 
+  if coalesce(p_host_code, '') <> '' then
+    -- host test run: reset any previous attempt, bypass the open/closed switch
+    if char_length(v_host) < 8 or p_host_code is distinct from v_host then
+      raise exception 'invalid_host_code';
+    end if;
+    insert into quiz.participants as p (name, email, token_hash, is_test)
+    values (v_name, v_email, v_hash, true)
+    on conflict (email) do update
+      set name = excluded.name, token_hash = excluded.token_hash, is_test = true
+    returning p.id into v_id;
+    delete from quiz.attempts where participant_id = v_id;
+    return jsonb_build_object('token', v_token, 'name', v_name, 'is_test', true);
+  end if;
+
+  if coalesce(quiz.cfg('quiz_open'), 'true') <> 'true' then
+    raise exception 'quiz_closed';
+  end if;
+
   insert into quiz.participants as p (name, email, token_hash)
-  values (v_name, v_email, encode(sha256(convert_to(v_token, 'utf8')), 'hex'))
+  values (v_name, v_email, v_hash)
   on conflict (email) do update
     set name = excluded.name, token_hash = excluded.token_hash
-    where not exists (select 1 from quiz.attempts a where a.participant_id = p.id)
+    where not p.is_test
+      and not exists (select 1 from quiz.attempts a where a.participant_id = p.id)
   returning p.id into v_id;
 
   if v_id is null then
     raise exception 'already_taken';
   end if;
 
-  return jsonb_build_object('token', v_token, 'name', v_name);
+  return jsonb_build_object('token', v_token, 'name', v_name, 'is_test', false);
 end;
 $$;
 
@@ -243,7 +270,8 @@ begin
 
   select * into v_att from quiz.attempts where participant_id = v_pid;
   if v_att.participant_id is null then
-    if coalesce(quiz.cfg('quiz_open'), 'true') <> 'true' then
+    if coalesce(quiz.cfg('quiz_open'), 'true') <> 'true'
+       and not exists (select 1 from quiz.participants where id = v_pid and is_test) then
       raise exception 'quiz_closed';
     end if;
     insert into quiz.attempts (participant_id) values (v_pid) returning * into v_att;
@@ -359,9 +387,10 @@ returns jsonb language sql stable security definer
 set search_path = quiz, pg_temp as
 $$
   select jsonb_build_object(
-    'registered', (select count(*) from quiz.participants),
-    'started',    (select count(*) from quiz.attempts),
-    'completed',  (select count(*) from quiz.attempts where submitted_at is not null)
+    'registered', (select count(*) from quiz.participants where not is_test),
+    'started',    (select count(*) from quiz.attempts a join quiz.participants p on p.id = a.participant_id where not p.is_test),
+    'completed',  (select count(*) from quiz.attempts a join quiz.participants p on p.id = a.participant_id
+                   where not p.is_test and a.submitted_at is not null)
   )
 $$;
 
@@ -372,7 +401,7 @@ do $$
 declare f text;
 begin
   foreach f in array array[
-    'quiz_config()', 'quiz_register(text,text)', 'quiz_status(text)', 'quiz_start(text)',
+    'quiz_config()', 'quiz_register(text,text,text)', 'quiz_status(text)', 'quiz_start(text)',
     'quiz_submit(text,jsonb)', 'quiz_result(text)', 'quiz_leaderboard(int)', 'quiz_stats()'
   ] loop
     execute format('revoke all on function public.%s from public', f);
@@ -383,23 +412,26 @@ end $$;
 -- -----------------------------------------------------------------------------
 -- Reporting views for stakeholders (query in the SQL editor; not reachable via API)
 -- -----------------------------------------------------------------------------
+create or replace view quiz.v_real_attempts as      -- attempts of real participants only (host test runs excluded)
+select a.* from quiz.attempts a join quiz.participants p on p.id = a.participant_id where not p.is_test;
+
 create or replace view quiz.v_summary as
-select (select count(*) from quiz.participants)                                  as registered,
+select (select count(*) from quiz.participants where not is_test)                as registered,
        count(*)                                                                  as started,
        count(*) filter (where submitted_at is not null)                          as completed,
        round(100.0 * count(*) filter (where submitted_at is not null)
-             / nullif((select count(*) from quiz.participants), 0), 1)           as completion_pct,
+             / nullif((select count(*) from quiz.participants where not is_test), 0), 1) as completion_pct,
        round(avg(score) filter (where submitted_at is not null), 2)              as avg_score,
        percentile_cont(0.5) within group (order by score)
              filter (where submitted_at is not null)                             as median_score,
        max(score)                                                                as best_score,
        round(avg(duration_ms) filter (where submitted_at is not null) / 1000.0, 1) as avg_seconds_taken,
        max(total)                                                                as questions
-from quiz.attempts;
+from quiz.v_real_attempts;
 
 create or replace view quiz.v_score_distribution as
 select score, count(*) as participants
-from quiz.attempts
+from quiz.v_real_attempts
 where submitted_at is not null
 group by score
 order by score desc;
@@ -413,7 +445,7 @@ select q.position,
        round(100.0 * count(*) filter (where quiz.is_correct(q.correct, a.answers -> q.id::text))
              / nullif(count(a.participant_id), 0), 1)                       as pct_correct
 from quiz.questions q
-left join quiz.attempts a on a.submitted_at is not null
+left join quiz.v_real_attempts a on a.submitted_at is not null
 group by q.id, q.position, q.prompt, q.kind
 order by q.position;
 
@@ -421,5 +453,5 @@ create or replace view quiz.v_unfinished as
 select p.name, p.email, a.started_at
 from quiz.attempts a
 join quiz.participants p on p.id = a.participant_id
-where a.submitted_at is null
+where a.submitted_at is null and not p.is_test
 order by a.started_at;

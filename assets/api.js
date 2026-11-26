@@ -6,6 +6,7 @@
   var ERRORS = {
     invalid_name: "Please enter your full name (2 to 60 characters).",
     invalid_email: "Please use your IBM email address (ending in ibm.com).",
+    invalid_host_code: "That host code is not valid.",
     already_taken: "This email has already completed the quiz. Each person gets one attempt.",
     quiz_closed: "The quiz is closed right now. Please check with your host.",
     invalid_token: "Your session expired. Please register again.",
@@ -59,7 +60,11 @@
   window.QuizApi = {
     isConfigured: isConfigured,
     config:      function ()               { return rpc("quiz_config"); },
-    register:    function (name, email)    { return rpc("quiz_register", { p_name: name, p_email: email }); },
+    register:    function (name, email, hostCode) {
+      var args = { p_name: name, p_email: email };
+      if (hostCode) { args.p_host_code = hostCode; }   // only host test runs send this
+      return rpc("quiz_register", args);
+    },
     status:      function (token)          { return rpc("quiz_status", { p_token: token }); },
     start:       function (token)          { return rpc("quiz_start", { p_token: token }); },
     submit:      function (token, answers) { return rpc("quiz_submit", { p_token: token, p_answers: answers }); },
