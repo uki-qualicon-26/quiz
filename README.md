@@ -1,5 +1,7 @@
 # Bob Quiz Challenge
 
+> **Running the event?** See the step-by-step [Host guide](HOST_GUIDE.md): participant instructions, host test mode, ceremony, reports and troubleshooting.
+
 A time-boxed, multiple-choice quiz about the IBM Bob interface, with a live leaderboard and an
 F1-style podium ceremony for the big screen. Built for a live session of roughly 160 to 190 people.
 
@@ -103,6 +105,8 @@ the project is awake.
 | `supabase/schema.sql` | Tables, scoring functions, API, reporting views |
 | `supabase/seed_questions.template.sql` | Question bank template (the real `seed_questions.sql` is git-ignored) |
 | `supabase/reports.sql` | Stakeholder queries and host controls |
+| `HOST_GUIDE.md` | Step-by-step guide for the host and co-host |
+| `assets/qualicon-bg.svg`, `assets/qualicon-badge.svg` | Qualicon 2026 theme artwork |
 
 
 ## Host test runs (not counted)
