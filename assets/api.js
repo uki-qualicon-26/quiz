@@ -7,6 +7,7 @@
     invalid_name: "Please enter your full name (2 to 60 characters).",
     invalid_email: "Please use your IBM email address (ending in ibm.com).",
     invalid_host_code: "That host code is not valid.",
+    reset_locked: "Clearing is locked (the quiz is live). Unlock it first.",
     already_taken: "This email has already completed the quiz. Each person gets one attempt.",
     quiz_closed: "The quiz is closed right now. Please check with your host.",
     invalid_token: "Your session expired. Please register again.",
@@ -70,6 +71,7 @@
     submit:      function (token, answers) { return rpc("quiz_submit", { p_token: token, p_answers: answers }); },
     result:      function (token)          { return rpc("quiz_result", { p_token: token }); },
     leaderboard: function (limit)          { return rpc("quiz_leaderboard", { p_limit: limit || 10 }); },
-    stats:       function ()               { return rpc("quiz_stats"); }
+    stats:       function ()               { return rpc("quiz_stats"); },
+    hostReset:   function (hostCode, action) { return rpc("quiz_host_reset", { p_host_code: hostCode, p_action: action }); }
   };
 })();

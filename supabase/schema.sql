@@ -394,6 +394,40 @@ $$
   )
 $$;
 
+-- Host control from the big-screen page (?host=1): clear all trial data, or lock/unlock the clear button.
+-- Needs the secret host code. Once locked ("Go live"), nothing can be cleared until it is unlocked again.
+create or replace function public.quiz_host_reset(p_host_code text, p_action text)
+returns jsonb language plpgsql security definer
+set search_path = quiz, pg_temp as
+$$
+declare
+  v_host    text := coalesce(quiz.cfg('host_code'), '');
+  v_deleted int;
+begin
+  if char_length(v_host) < 8 or p_host_code is distinct from v_host then
+    raise exception 'invalid_host_code';
+  end if;
+  if p_action = 'lock' then
+    insert into quiz.config (key, value) values ('reset_locked', 'true')
+      on conflict (key) do update set value = 'true';
+    return jsonb_build_object('locked', true, 'deleted', 0);
+  elsif p_action = 'unlock' then
+    insert into quiz.config (key, value) values ('reset_locked', 'false')
+      on conflict (key) do update set value = 'false';
+    return jsonb_build_object('locked', false, 'deleted', 0);
+  elsif p_action = 'clear' then
+    if coalesce(quiz.cfg('reset_locked'), 'false') = 'true' then
+      raise exception 'reset_locked';
+    end if;
+    -- "where true" keeps Supabase's safe-update guard happy; attempts are removed by cascade.
+    delete from quiz.participants where true;
+    get diagnostics v_deleted = row_count;
+    return jsonb_build_object('locked', false, 'deleted', v_deleted);
+  end if;
+  raise exception 'invalid_action';
+end;
+$$;
+
 -- -----------------------------------------------------------------------------
 -- Privileges: the browser (anon) may only execute the quiz_* functions.
 -- -----------------------------------------------------------------------------
@@ -402,7 +436,8 @@ declare f text;
 begin
   foreach f in array array[
     'quiz_config()', 'quiz_register(text,text,text)', 'quiz_status(text)', 'quiz_start(text)',
-    'quiz_submit(text,jsonb)', 'quiz_result(text)', 'quiz_leaderboard(int)', 'quiz_stats()'
+    'quiz_submit(text,jsonb)', 'quiz_result(text)', 'quiz_leaderboard(int)', 'quiz_stats()',
+    'quiz_host_reset(text,text)'
   ] loop
     execute format('revoke all on function public.%s from public', f);
     execute format('grant execute on function public.%s to anon, authenticated', f);

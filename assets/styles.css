@@ -196,3 +196,7 @@ input:focus-visible, button:focus-visible, .opt:focus-within { outline: 3px soli
 /* Submit sits once at the end of the last question, not floating over the quiz */
 .submit-area { text-align: center; padding: 8px 0 40px; }
 .submit-area .btn { min-width: 260px; }
+
+/* Host controls on the big screen (presenter.html?host=1) */
+#host-panel input { width: 220px; }
+#host-panel .btn { white-space: nowrap; }
