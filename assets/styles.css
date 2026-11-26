@@ -213,3 +213,7 @@ input:focus-visible, button:focus-visible, .opt:focus-within { outline: 3px soli
   max-width: 720px; margin: 0 auto 28px; }
 .stage .counter { min-width: 0; padding: 14px 12px; }
 @media (max-width: 560px) { .stage .counters { gap: 10px; } .stage .counter { padding: 10px 6px; } }
+
+/* Participant header: centre the title and tagline between the two logos */
+.brand { justify-content: center; }
+.brand > div { text-align: center; }
