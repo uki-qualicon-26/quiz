@@ -139,7 +139,7 @@ input:focus-visible, button:focus-visible, .opt:focus-within { outline: 3px soli
 
 .logo-img { display: block; width: 56px; height: 56px; border-radius: 12px; flex: none; }
 .stage-title { display: flex; align-items: center; justify-content: center; gap: 14px; }
-.stage-title .logo-img { width: 64px; height: 64px; }
+.stage-title .logo-img { width: 96px; height: 96px; border-radius: 18px; }
 
 .notice { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
   padding: 12px 16px; margin-bottom: 16px; background: var(--surface2); border: 1px solid var(--accent, #4f86f7);
@@ -200,3 +200,9 @@ input:focus-visible, button:focus-visible, .opt:focus-within { outline: 3px soli
 /* Host controls on the big screen (presenter.html?host=1) */
 #host-panel input { max-width: 320px; }
 #host-panel .btn { white-space: nowrap; }
+
+/* Bob logo and Qualicon badge share one size in the header (participant page) */
+.logo-img, .badge-img { width: 72px; height: 72px; }
+@media (max-width: 520px) { .logo-img, .badge-img { width: 56px; height: 56px; } }
+.stage-title .logo-img, .stage-title .badge-img { width: 96px; height: 96px; }
+@media (max-width: 700px) { .stage-title .logo-img, .stage-title .badge-img { width: 64px; height: 64px; } }
