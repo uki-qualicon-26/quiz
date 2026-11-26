@@ -5,7 +5,7 @@
 A time-boxed, multiple-choice quiz about the IBM Bob interface, with a live leaderboard and an
 F1-style podium ceremony for the big screen. Built for a live session of roughly 160 to 190 people.
 
-- **Participants** open one URL, register with name and IBM email, then answer 10 questions in 2 minutes.
+- **Participants** open one URL, register with name and IBM email, then answer 16 questions (the time box is configurable, 3 minutes recommended).
   Single-answer questions allow one choice; "select all that apply" questions allow several.
 - **Scoring** happens on the server. Ranking is score first, then fastest time. A multi-select question
   only counts if you pick exactly the right set.
@@ -29,12 +29,12 @@ In **SQL Editor**, run these two files in order (paste, then Run):
 1. `supabase/schema.sql`
 2. `supabase/seed_questions.sql` (your question bank, see step 3)
 
-Check it worked: `select count(*) from quiz.questions;` should return 10.
+Check it worked: `select count(*) from quiz.questions;` should return 16.
 
 ### 3. Prepare the question bank
 The answer key is deliberately **not committed** (`supabase/seed_questions.sql` is git-ignored) because the repo is
 public. Copy `supabase/seed_questions.template.sql` to `supabase/seed_questions.sql`, write your questions and run it.
-The organiser keeps the real 10-question file (and the e2e tests) in a separate private folder, `bob-quiz-portal-private/`. Question 3 (starting Bobcoin budget) follows the Bob documentation:
+The organiser keeps the real 16-question file (and the e2e tests) in a separate private folder, `bob-quiz-portal-private/`. Question 3 (starting Bobcoin budget) follows the Bob documentation:
 Tier 1 = 500 Bobcoins per month. If your environment grants a different amount, change the option text and the
 `correct` value, then re-run the file (it updates questions in place).
 
@@ -73,8 +73,8 @@ update quiz.config set value = 'false' where key = 'quiz_open';       -- stop ne
 update quiz.config set value = 'false' where key = 'reveal_answers';  -- hide the answer key in reviews
 ```
 
-Timing note: 10 questions in 120 seconds is about 12 seconds per question, which suits easy to moderate
-questions. If people struggle in the dry run, raise `quiz_seconds` to 150 or 180.
+Timing note: allow about 11 to 12 seconds per question. For 16 questions set `quiz_seconds` to 180 (3 minutes).
+If people struggle in the dry run, raise it to 200 or more.
 
 ## Security design
 
