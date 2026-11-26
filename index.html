@@ -6,15 +6,15 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://*.supabase.co; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <title>Bob Quiz Challenge</title>
-  <link rel="icon" type="image/png" href="assets/favicon.png?v=202611261220">
-  <link rel="stylesheet" href="assets/styles.css?v=202611261220">
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=202611261226">
+  <link rel="stylesheet" href="assets/styles.css?v=202611261226">
 </head>
 <body>
 <div class="wrap">
   <div class="brand">
-    <img class="logo-img" src="assets/bob-logo.png?v=202611261220" alt="IBM Bob" width="72" height="72">
+    <img class="logo-img" src="assets/bob-logo.png?v=202611261226" alt="IBM Bob" width="72" height="72">
     <div><h1>Bob Quiz Challenge</h1><div class="muted small">Fast, accurate and on the podium</div></div>
-    <img class="badge-img" src="assets/qualicon-badge.svg?v=202611261220" alt="Qualicon 2026" width="72" height="72">
+    <img class="badge-img" src="assets/qualicon-badge.svg?v=202611261226" alt="Qualicon 2026" width="72" height="72">
   </div>
 
   <div id="error" class="error hidden" role="alert"></div>
@@ -23,7 +23,7 @@
   <section id="view-register" class="card hidden">
     <h2>Register to play</h2>
     <p class="muted">Enter your name and IBM email. You get <b id="reg-total">10</b> questions and
-      <b id="reg-time">2:00</b> on the clock. Score first, speed breaks ties. One attempt per person.</p>
+      <b id="reg-time">3:00</b> on the clock. Score first, speed breaks ties. One attempt per person.</p>
     <form id="reg-form" novalidate>
       <label for="name">Your name</label>
       <input id="name" type="text" autocomplete="name" maxlength="60" required>
@@ -53,7 +53,7 @@
   <!-- 3. Quiz -->
   <section id="view-quiz" class="hidden">
     <div class="timerbar">
-      <div class="timerline"><span id="progress">0 of 10 answered</span><span id="clock" class="clock" aria-live="off">2:00</span></div>
+      <div class="timerline"><span id="progress">0 of 12 answered</span><span id="clock" class="clock" aria-live="off">3:00</span></div>
       <div class="track"><div id="fill" class="fill"></div></div>
     </div>
     <div id="questions"></div>
@@ -82,9 +82,9 @@
     <div id="review"></div>
   </section>
 </div>
-<script src="config.js?v=202611261220"></script>
-<script src="assets/api.js?v=202611261220"></script>
-<script src="assets/podium.js?v=202611261220"></script>
-<script src="assets/app.js?v=202611261220"></script>
+<script src="config.js?v=202611261226"></script>
+<script src="assets/api.js?v=202611261226"></script>
+<script src="assets/podium.js?v=202611261226"></script>
+<script src="assets/app.js?v=202611261226"></script>
 </body>
 </html>

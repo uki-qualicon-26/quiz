@@ -24,9 +24,9 @@ create table if not exists quiz.config (
 );
 
 -- Host-tunable settings. Example:
---   update quiz.config set value = '180' where key = 'quiz_seconds';
+--   update quiz.config set value = '240' where key = 'quiz_seconds';
 insert into quiz.config (key, value) values
-  ('quiz_seconds',   '120'),   -- time box per participant, in seconds
+  ('quiz_seconds',   '180'),   -- time box per participant, in seconds
   ('quiz_open',      'true'),  -- false = no new registrations / starts
   ('reveal_answers', 'true')   -- false = show right/wrong only, hide the answer key
 on conflict (key) do nothing;
@@ -176,7 +176,7 @@ set search_path = quiz, pg_temp as
 $$
   select jsonb_build_object(
     'quiz_open',       coalesce(quiz.cfg('quiz_open'), 'true') = 'true',
-    'quiz_seconds',    coalesce(quiz.cfg('quiz_seconds'), '120')::int,
+    'quiz_seconds',    coalesce(quiz.cfg('quiz_seconds'), '180')::int,
     'total_questions', (select count(*) from quiz.questions)
   )
 $$;
@@ -264,7 +264,7 @@ $$
 declare
   v_pid  uuid := quiz.token_to_participant(p_token);
   v_att  quiz.attempts;
-  v_secs int  := coalesce(quiz.cfg('quiz_seconds'), '120')::int;
+  v_secs int  := coalesce(quiz.cfg('quiz_seconds'), '180')::int;
 begin
   if v_pid is null then raise exception 'invalid_token'; end if;
 
@@ -303,7 +303,7 @@ $$
 declare
   v_pid     uuid := quiz.token_to_participant(p_token);
   v_att     quiz.attempts;
-  v_secs    int  := coalesce(quiz.cfg('quiz_seconds'), '120')::int;
+  v_secs    int  := coalesce(quiz.cfg('quiz_seconds'), '180')::int;
   v_elapsed numeric;
   v_late    boolean;
   v_clean   jsonb;

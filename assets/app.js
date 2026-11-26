@@ -8,7 +8,7 @@
   var el = P.el;
 
   var state = { token: null, name: null, cfg: null, questions: [], answers: {}, endsAt: 0,
-                totalSecs: 120, isTest: false, timer: null, submitting: false, lbTimer: null, myRank: null };
+                totalSecs: 180, isTest: false, timer: null, submitting: false, lbTimer: null, myRank: null };
 
   /* ---------- helpers ---------- */
   function show(view) {

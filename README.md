@@ -5,7 +5,7 @@
 A time-boxed, multiple-choice quiz about the IBM Bob interface, with a live leaderboard and an
 F1-style podium ceremony for the big screen. Built for a live session of roughly 160 to 190 people.
 
-- **Participants** open one URL, register with name and IBM email, then answer 12 questions (the time box is configurable, 2.5 minutes recommended).
+- **Participants** open one URL, register with name and IBM email, then answer 12 questions (the time box is configurable, 3 minutes recommended).
   Single-answer questions allow one choice; "select all that apply" questions allow several.
 - **Scoring** happens on the server. Ranking is score first, then fastest time. A multi-select question
   only counts if you pick exactly the right set.
@@ -68,12 +68,12 @@ truncate quiz.participants cascade;
 Host controls (SQL editor):
 
 ```sql
-update quiz.config set value = '120'   where key = 'quiz_seconds';    -- time box in seconds
+update quiz.config set value = '180'   where key = 'quiz_seconds';    -- time box in seconds
 update quiz.config set value = 'false' where key = 'quiz_open';       -- stop new registrations
 update quiz.config set value = 'false' where key = 'reveal_answers';  -- hide the answer key in reviews
 ```
 
-Timing note: allow about 11 to 12 seconds per question. For 12 questions set `quiz_seconds` to 150 (2.5 minutes).
+Timing note: allow about 11 to 12 seconds per question. For 12 questions set `quiz_seconds` to 180 (3 minutes).
 If people struggle in the dry run, raise it to 180.
 
 ## Security design

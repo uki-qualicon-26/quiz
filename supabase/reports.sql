@@ -40,7 +40,7 @@ order by 1;
 -- Host controls
 -- -----------------------------------------------------------------------------
 -- Change the time box (seconds). Applies to attempts that have not started yet.
---   update quiz.config set value = '120' where key = 'quiz_seconds';
+--   update quiz.config set value = '180' where key = 'quiz_seconds';
 -- Close / reopen registration and starts:
 --   update quiz.config set value = 'false' where key = 'quiz_open';
 -- Hide the answer key in the review screen until you are ready to share it:
