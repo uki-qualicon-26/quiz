@@ -81,7 +81,7 @@ Use this to rehearse as often as you like. Host runs are excluded from the leade
 
 ## 7. After the event: reports for stakeholders
 
-Open **SQL Editor** and use the queries in [`supabase/reports.sql`](supabase/reports.sql). Export any result with **Export > Download CSV**.
+Open **SQL Editor** and run the sections of [`supabase/stakeholder_report.sql`](supabase/stakeholder_report.sql) (headline numbers, score distribution, hardest questions, top 10, registrations over time, drop-off). Export any result with **Export > Download CSV**. Section 7 lists emails for follow-up, so keep it to organisers. The individual queries below and in [`supabase/reports.sql`](supabase/reports.sql) also work.
 
 | Question | Query |
 |---|---|

@@ -63,7 +63,7 @@ truncate quiz.participants cascade;
 | Before | Share the participant URL. Open `presenter.html` on the projector. |
 | During | The presenter page shows registered / playing / finished counters and the live top 10. |
 | Ceremony | When the time box has passed for everyone, click **Start podium ceremony**. It reveals P3, P2, then P1 with confetti. |
-| After | Run the queries in `supabase/reports.sql` and export CSV for stakeholders. |
+| After | Run `supabase/stakeholder_report.sql` (or the queries in `supabase/reports.sql`) and export CSV for stakeholders. |
 
 Host controls (SQL editor):
 
@@ -104,7 +104,8 @@ the project is awake.
 | `assets/api.js`, `config.js` | Supabase client and public settings |
 | `supabase/schema.sql` | Tables, scoring functions, API, reporting views |
 | `supabase/seed_questions.template.sql` | Question bank template (the real `seed_questions.sql` is git-ignored) |
-| `supabase/reports.sql` | Stakeholder queries and host controls |
+| `supabase/reports.sql` | Organiser queries and host controls |
+| `supabase/stakeholder_report.sql` | Shareable stakeholder report (no emails except the organiser-only follow-up list) |
 | `HOST_GUIDE.md` | Step-by-step guide for the host and co-host |
 | `assets/qualicon-bg.svg`, `assets/qualicon-badge.svg` | Qualicon 2026 theme artwork |
 
