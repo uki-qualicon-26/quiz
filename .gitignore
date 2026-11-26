@@ -13,3 +13,6 @@ supabase/seed_questions.sql
 
 # E2E tests contain the answer key; kept outside the public repo.
 tests/
+
+# Facilitator material (local only, not published)
+facilitator/
