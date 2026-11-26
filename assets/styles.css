@@ -135,3 +135,7 @@ input:focus-visible, button:focus-visible, .opt:focus-within { outline: 3px soli
 .mb { margin-bottom: 14px; }
 .mt { margin-top: 18px; }
 .left { text-align: left; }
+
+.logo-img { display: block; width: 56px; height: 56px; border-radius: 12px; flex: none; }
+.stage-title { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.stage-title .logo-img { width: 64px; height: 64px; }
