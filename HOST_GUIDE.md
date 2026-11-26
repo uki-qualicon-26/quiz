@@ -17,7 +17,7 @@ The host code and the Supabase keys are shared privately and never written here.
 Read this out, or put it on a slide.
 
 1. Open the link and enter your **name** and **IBM email** (it must end in `ibm.com`).
-2. You get **16 questions** and **3 minutes**. The clock starts when you press **Start** and cannot be paused.
+2. You get **12 questions** and **2 minutes 30 seconds**. The clock starts when you press **Start** and cannot be paused.
 3. **Select one** questions allow a single answer. **Select all that apply** questions need every correct option and no extras.
 4. Your answers are submitted automatically when time runs out. Refreshing the page does not reset your timer.
 5. Ranking is **score first, then speed**. Everyone sees names and scores on the leaderboard. Emails are never shown.
@@ -29,7 +29,7 @@ Read this out, or put it on a slide.
 - Open the Supabase dashboard to confirm the project is awake. Free projects pause after a week of inactivity.
 - Add a second owner to the `uki-qualicon-26` GitHub organisation (People tab), so you are not the only admin.
 - Open the participant link from an IBM laptop on the office network, in case it is blocked.
-- Do a dry run with 2 or 3 colleagues. Check the 3:00 time box and the podium ceremony. If 3 minutes is too tight, raise it (section 8).
+- Do a dry run with 2 or 3 colleagues. Check the 2:30 time box and the podium ceremony. If 2:30 is too tight, raise it (section 8).
 
 **Set the host code (once)**
 
@@ -70,7 +70,7 @@ Use this to rehearse as often as you like. Host runs are excluded from the leade
 - Show the big-screen page. It shows registered, playing and finished counters and the live top 10.
 - Participants see their own result and the leaderboard on their phones, refreshed every few seconds.
 - To stop new entries: `update quiz.config set value = 'false' where key = 'quiz_open';` (set `'true'` to reopen).
-- Let people finish. Everyone has the full time box (3 minutes by default, see section 8) from pressing Start, plus a 10 second network grace.
+- Let people finish. Everyone has the full time box (2:30 by default, see section 8) from pressing Start, plus a 10 second network grace.
 
 ## 6. Podium ceremony
 
@@ -103,7 +103,7 @@ Run in **SQL Editor**. Change these before the event, not while people are playi
 
 | Goal | SQL |
 |---|---|
-| Time box (seconds). 16 questions: 180 recommended | `update quiz.config set value = '180' where key = 'quiz_seconds';` |
+| Time box (seconds). 12 questions: 150 recommended | `update quiz.config set value = '150' where key = 'quiz_seconds';` |
 | Close or reopen registration | `update quiz.config set value = 'false' where key = 'quiz_open';` |
 | Hide the answer key in reviews | `update quiz.config set value = 'false' where key = 'reveal_answers';` |
 | Turn host mode off | `delete from quiz.config where key = 'host_code';` |
@@ -123,11 +123,11 @@ Run in **SQL Editor**. Change these before the event, not while people are playi
 
 ## 10. Quiz content
 
-- The 16 questions and their answer key are **not** in this public repo, so participants cannot read them. The organiser keeps the real file in a private folder.
+- The 12 questions and their answer key are **not** in this public repo, so participants cannot read them. The organiser keeps the real file in a private folder.
 - To change questions, edit your private `seed_questions.sql` and run it in the SQL Editor. It updates questions in place. `supabase/seed_questions.template.sql` shows the format.
 - Question 3 uses the documented Tier 1 allowance of 500 Bobcoins per month. If you want a different figure, change that question's option text and `correct` value, then re-run the file.
 - Built-in modes are Agent, Plan and Ask. Advanced is not a default mode.
-- Questions 11 to 14 cover **Bobalytics** (where to open it, the Bob factor, the three KPIs, and anonymized team charts). Questions 15 and 16 cover **pricing** (which plan includes Bobalytics and the admin dashboard, and the 30-day free trial). They follow the Bob documentation and the public page https://bob.ibm.com/pricing. Prices and Bobcoin allowances on that page are indicative and vary by country, so the quiz asks about plan features and trial length and not about prices.
+- Questions 7 to 10 cover **Bobalytics** (where to open it, the Bob factor, the three KPIs, and anonymized team charts). Questions 11 and 12 cover **pricing** (which plan includes Bobalytics and the admin dashboard, and the 30-day free trial). They follow the Bob documentation and the public page https://bob.ibm.com/pricing. Prices and Bobcoin allowances on that page are indicative and vary by country, so the quiz asks about plan features and trial length and not about prices.
 
 ## 11. Look and feel
 
