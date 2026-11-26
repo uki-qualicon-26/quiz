@@ -206,3 +206,10 @@ input:focus-visible, button:focus-visible, .opt:focus-within { outline: 3px soli
 @media (max-width: 520px) { .logo-img, .badge-img { width: 56px; height: 56px; } }
 .stage-title .logo-img, .stage-title .badge-img { width: 96px; height: 96px; }
 @media (max-width: 700px) { .stage-title .logo-img, .stage-title .badge-img { width: 64px; height: 64px; } }
+
+/* Big screen: breathing room under the logos, and three equal-width counter boxes */
+.stage-title { margin: 12px 0 32px; }
+.stage .counters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  max-width: 720px; margin: 0 auto 28px; }
+.stage .counter { min-width: 0; padding: 14px 12px; }
+@media (max-width: 560px) { .stage .counters { gap: 10px; } .stage .counter { padding: 10px 6px; } }
