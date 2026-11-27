@@ -223,3 +223,7 @@ input:focus-visible, button:focus-visible, .opt:focus-within { outline: 3px soli
 a.btn { text-decoration: none; text-align: center; }
 .next-card { text-align: center; }
 .next-card .row { justify-content: center; margin-top: 12px; }
+
+/* Registration screen: wider card so the privacy notice fits on one line on large screens */
+.wrap:has(#view-register:not(.hidden)) { max-width: 1240px; }
+@supports selector(:has(*)) { @media (min-width: 1280px) { .privacy { white-space: nowrap; font-size: .8rem; } } }
