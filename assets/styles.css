@@ -227,3 +227,6 @@ a.btn { text-decoration: none; text-align: center; }
 /* Registration screen: wider card so the privacy notice fits on one line on large screens */
 .wrap:has(#view-register:not(.hidden)) { max-width: 1240px; }
 @supports selector(:has(*)) { @media (min-width: 1280px) { .privacy { white-space: nowrap; font-size: .8rem; } } }
+
+/* Quiz questions screen: moderately wider card (760px -> 960px) */
+.wrap:has(#view-quiz:not(.hidden)) { max-width: 960px; }
