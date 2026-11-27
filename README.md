@@ -82,8 +82,9 @@ If people struggle in the dry run, raise it to 180.
 - The **answer key never leaves the database** until a participant has submitted, so it cannot be read from dev tools.
 - Each registration gets a random secret token. Only its SHA-256 hash is stored. The token lives in `sessionStorage` for that tab.
 - The clock is server-side. Submissions more than 10 seconds past the time box score zero. Refreshing the page does not reset the timer.
-- Email must end in `ibm.com` (checked in the browser and again by the database, including a constraint on the table). One attempt per email.
-- Only names and scores are public. Emails are visible to organisers only, through SQL.
+- Email must end in `ibm.com` (checked in the browser and again by the database). One attempt per email.
+- The email is never stored. The database keeps only an HMAC-SHA256 hash of it (keyed with the `email_hmac_key` secret in `quiz.config`) to stop duplicate registrations. A stored hash is still personal data under UK GDPR, so the privacy notice on the registration page says "hashed", and all data is deleted one week after the event (`truncate quiz.participants cascade;`).
+- Only names and scores are public. No view or function returns an email.
 - A strict Content Security Policy restricts scripts, styles and network calls to this site and `*.supabase.co`. All user text is rendered with `textContent`, so names cannot inject HTML.
 
 Known limitation, by design for this event: registration is name plus domain-validated email with no email verification,
@@ -105,7 +106,7 @@ the project is awake.
 | `supabase/schema.sql` | Tables, scoring functions, API, reporting views |
 | `supabase/seed_questions.template.sql` | Question bank template (the real `seed_questions.sql` is git-ignored) |
 | `supabase/reports.sql` | Organiser queries and host controls |
-| `supabase/stakeholder_report.sql` | Shareable stakeholder report (no emails except the organiser-only follow-up list) |
+| `supabase/stakeholder_report.sql` | Shareable stakeholder report (names and counts only) |
 | `HOST_GUIDE.md` | Step-by-step guide for the host and co-host |
 | `assets/qualicon-bg.svg`, `assets/qualicon-badge.svg` | Qualicon 2026 theme artwork |
 

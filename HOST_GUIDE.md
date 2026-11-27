@@ -17,7 +17,7 @@ The host code and the Supabase keys are shared privately and never written here.
 
 Read this out, or put it on a slide.
 
-1. Open the link and enter your **name** and **IBM email** (it must end in `ibm.com`).
+1. Open the link and enter your **name** and **IBM email** (it must end in `ibm.com`). The email is only used to stop duplicate entries. It is hashed, never stored or shown, and everything is deleted one week after the event. Questions: satishkumar.pillai@ibm.com.
 2. You get **12 questions** and **3 minutes**. The clock starts when you press **Start** and cannot be paused.
 3. **Select one** questions allow a single answer. **Select all that apply** questions need every correct option and no extras.
 4. Your answers are submitted automatically when time runs out. Refreshing the page does not reset your timer.
@@ -31,6 +31,22 @@ Read this out, or put it on a slide.
 - Add a second owner to the `uki-qualicon-26` GitHub organisation (People tab), so you are not the only admin.
 - Open the participant link from an IBM laptop on the office network, in case it is blocked.
 - Do a dry run with 2 or 3 colleagues. Check the 3:00 time box and the podium ceremony. If 3:00 is too tight, raise it (section 8).
+
+**Set the email hashing secret (once)**
+
+The IBM email is never stored. The database keeps only a keyed one-way hash of it, using a secret you choose.
+
+1. Choose a long random secret (16 or more characters). Never put it in the repo or share it.
+2. In **SQL Editor**, with no text highlighted:
+
+   ```sql
+   insert into quiz.config (key, value) values ('email_hmac_key', 'PUT-A-LONG-RANDOM-SECRET-HERE')
+   on conflict (key) do update set value = excluded.value;
+   ```
+
+   If `quiz.config` does not exist yet, run `schema.sql` first (it creates the table), then add the secret. Until the secret is set, registration shows "Registration is not set up yet".
+3. Do not change the secret once people have registered: old hashes would stop matching and people could register twice.
+4. If the database holds registrations from the older version (which stored plain emails), run `truncate quiz.participants cascade;` before running the new `schema.sql`.
 
 **Set the host code (once)**
 
@@ -81,14 +97,14 @@ Use this to rehearse as often as you like. Host runs are excluded from the leade
 
 ## 7. After the event: reports for stakeholders
 
-Open **SQL Editor** and run the sections of [`supabase/stakeholder_report.sql`](supabase/stakeholder_report.sql) (headline numbers, score distribution, hardest questions, top 10, registrations over time, drop-off). Export any result with **Export > Download CSV**. Section 7 lists emails for follow-up, so keep it to organisers. The individual queries below and in [`supabase/reports.sql`](supabase/reports.sql) also work.
+Open **SQL Editor** and run the sections of [`supabase/stakeholder_report.sql`](supabase/stakeholder_report.sql) (headline numbers, score distribution, hardest questions, top 10, registrations over time, drop-off). Export any result with **Export > Download CSV**. No emails are held, so every section shows names and counts only. The individual queries below and in [`supabase/reports.sql`](supabase/reports.sql) also work.
 
 | Question | Query |
 |---|---|
 | How many registered, started, finished? Average and median score? | `select * from quiz.v_summary;` |
 | How many got full marks, one short, and so on? | `select * from quiz.v_score_distribution;` |
 | Which questions were hardest? | `select position, prompt, answered, correct, pct_correct from quiz.v_question_accuracy order by pct_correct asc;` |
-| Full leaderboard with emails (organisers only) | `select rank, name, email, score, total, round(duration_ms/1000.0,1) as seconds from quiz.v_leaderboard order by rank;` |
+| Full leaderboard (names and results) | `select rank, name, score, total, round(duration_ms/1000.0,1) as seconds from quiz.v_leaderboard order by rank;` |
 | Started but did not finish | `select * from quiz.v_unfinished;` |
 
 Host test runs are excluded from all of these.
@@ -96,6 +112,7 @@ Host test runs are excluded from all of these.
 **Close down**
 - Stop new entries: `update quiz.config set value = 'false' where key = 'quiz_open';`
 - Switch host mode off: `delete from quiz.config where key = 'host_code';`
+- **Delete all personal data one week after the event** (this is what the privacy notice promises): `truncate quiz.participants cascade;` Export any CSV reports you need first. Then confirm with `select count(*) from quiz.participants;` (expect 0).
 - When you no longer need the site, make the repo private or delete the GitHub Pages site.
 
 ## 8. Host controls
@@ -115,9 +132,10 @@ Run in **SQL Editor**. Change these before the event, not while people are playi
 |---|---|
 | Remove all test and dry-run data before the live session | Easiest: open your private page https://uki-qualicon-26.github.io/quiz/host.html, enter the host code and press **Clear all trial data**. Or in SQL: `truncate quiz.participants cascade;` |
 | Protect the leaderboard once the quiz is live | On the same private page press **Go live (lock clearing)**. Clearing is refused until you press **Unlock clearing** |
-| A participant mistyped their email or needs another attempt | `delete from quiz.participants where email = 'person@ibm.com';` They can then register again. |
-| See who has registered | `select name, email, created_at, is_test from quiz.participants order by created_at;` |
+| A participant mistyped their email or needs another attempt | Emails are stored only as hashes, so hash the address to find the row: `delete from quiz.participants where email_hash = encode(extensions.hmac(convert_to(lower('person@ibm.com'), 'utf8'), convert_to((select value from quiz.config where key = 'email_hmac_key'), 'utf8'), 'sha256'), 'hex');` They can then register again. Alternatively delete by name: `delete from quiz.participants where name = 'Their Name';` |
+| See who has registered | `select name, created_at, is_test from quiz.participants order by created_at;` |
 | A participant says "This email has already completed the quiz" | That email already has a result. Delete it with the line above only if you intend to give them another go. |
+| Registration says "not set up yet" | The `email_hmac_key` secret is missing or shorter than 16 characters. Set it as in section 3. |
 | Page looks old after an update | Hard refresh with Cmd+Shift+R (Ctrl+F5 on Windows). |
 | "Run selected" error in the SQL Editor | Click an empty area so nothing is highlighted, then Run. |
 | Site will not load for anyone | Check the Supabase project is not paused (dashboard > Restore), then try the link from another network. |

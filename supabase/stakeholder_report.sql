@@ -1,8 +1,8 @@
 -- =============================================================================
 -- Stakeholder report. Run in the Supabase SQL editor (Dashboard > SQL Editor)
 -- after the event. Each section is one query: run it, then Export > Download CSV
--- for slides or Excel. Host test runs are excluded. No emails appear in any
--- section except the optional follow-up list at the end.
+-- for slides or Excel. Host test runs are excluded. Emails are not stored (only a
+-- one-way hash), so every section is names and counts only.
 -- =============================================================================
 
 -- 1. Headline: participation, completion and scores
@@ -51,9 +51,8 @@ from quiz.participants p
 left join quiz.attempts a on a.participant_id = p.id
 where not p.is_test;
 
--- 7. Optional follow-up list for organisers only (contains emails; do not share)
+-- 7. Registered but did not finish, by name (no contact details are held)
 select p.name,
-       p.email,
        case when a.participant_id is null then 'never started' else 'started, not finished' end as status
 from quiz.participants p
 left join quiz.attempts a on a.participant_id = p.id
@@ -111,8 +110,8 @@ from quiz.v_workshop_real
 group by 1
 order by 1;
 
--- 13. Follow-up list for organisers only (contains emails; do not share): finished the quiz, never opened the workshop
-select p.name, p.email
+-- 13. Finished the quiz, never opened the workshop (names only)
+select p.name
 from quiz.participants p
 join quiz.attempts a on a.participant_id = p.id and a.submitted_at is not null
 left join quiz.workshop_progress w on w.participant_id = p.id

@@ -14,14 +14,14 @@ select position, prompt, answered, correct, pct_correct
 from quiz.v_question_accuracy
 order by pct_correct asc;
 
--- 4. Full leaderboard with emails (organisers only)
-select rank, name, email, score, total, round(duration_ms / 1000.0, 1) as seconds
+-- 4. Full leaderboard (emails are not stored, so names and results only)
+select rank, name, score, total, round(duration_ms / 1000.0, 1) as seconds
 from quiz.v_leaderboard
 order by rank;
 
--- 5. Registered but never finished (follow-up list)
-select name, email, started_at from quiz.v_unfinished;
-select p.name, p.email
+-- 5. Registered but never finished
+select name, started_at from quiz.v_unfinished;
+select p.name
 from quiz.participants p
 left join quiz.attempts a on a.participant_id = p.id
 where a.participant_id is null and not p.is_test
@@ -51,5 +51,9 @@ order by 1;
 --   insert into quiz.config (key, value) values ('host_code', 'CHOOSE-A-LONG-SECRET')
 --     on conflict (key) do update set value = excluded.value;
 -- Disable host mode:  delete from quiz.config where key = 'host_code';
--- Wipe all participants and results between dry run and the live event:
+-- Wipe all participants and results between dry run and the live event (and one week after the event):
 --   truncate quiz.participants cascade;
+-- Hashing secret for emails (set once before the first registration; never put it in the repo):
+--   insert into quiz.config (key, value) values ('email_hmac_key', 'A-LONG-RANDOM-SECRET')
+--     on conflict (key) do update set value = excluded.value;
+-- Changing the secret later makes old hashes stop matching, so only change it with an empty participants table.

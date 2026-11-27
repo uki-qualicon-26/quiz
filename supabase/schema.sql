@@ -10,7 +10,19 @@
 --     before a participant has submitted.
 --   * Each participant gets a random secret token at registration. Only its
 --     SHA-256 hash is stored.
+--   * The IBM email is never stored. quiz_register checks it, then keeps only an
+--     HMAC-SHA256 hash (keyed with a secret in quiz.config) to stop duplicate
+--     registrations. No view or function returns an email.
+--
+-- Set the hashing secret once (see HOST_GUIDE.md, section 3). Until it is set, registration
+-- answers "server_not_configured":
+--   insert into quiz.config (key, value) values ('email_hmac_key', 'A-LONG-RANDOM-SECRET')
+--   on conflict (key) do update set value = excluded.value;
+-- If this database already holds registrations from an earlier version, clear them first
+-- (they contain plain emails):  truncate quiz.participants cascade;
 -- =============================================================================
+
+create extension if not exists pgcrypto with schema extensions;   -- provides hmac()
 
 create schema if not exists quiz;
 revoke all on schema quiz from public;
@@ -47,11 +59,25 @@ create table if not exists quiz.questions (
 create table if not exists quiz.participants (
   id         uuid primary key default gen_random_uuid(),
   name       text not null check (char_length(name) between 2 and 60),
-  email      text not null unique
-             check (email ~ '^[a-z0-9._%+''-]+@([a-z0-9-]+\.)*ibm\.com$'),
+  email_hash text not null unique,        -- HMAC-SHA256 of the lower-cased email; the email itself is never stored
   token_hash text not null,
   created_at timestamptz not null default now()
 );
+
+-- Migration from the older schema that stored plain emails: refuse if rows exist, otherwise drop the column.
+do $$
+begin
+  if exists (select 1 from information_schema.columns
+             where table_schema = 'quiz' and table_name = 'participants' and column_name = 'email') then
+    if exists (select 1 from quiz.participants) then
+      raise exception 'quiz.participants still holds plain emails. Run: truncate quiz.participants cascade;  then re-run this script.';
+    end if;
+    drop view if exists quiz.v_leaderboard, quiz.v_unfinished, quiz.v_workshop_real;
+    alter table quiz.participants drop column email;
+  end if;
+end
+$$;
+alter table quiz.participants add column if not exists email_hash text not null unique;
 -- Host test runs (retakeable, excluded from the leaderboard, counters and reports)
 alter table quiz.participants add column if not exists is_test boolean not null default false;
 
@@ -112,7 +138,6 @@ create or replace view quiz.v_leaderboard as
 select row_number() over (order by a.score desc, a.duration_ms asc, a.submitted_at asc)::int as rank,
        p.id   as participant_id,
        p.name,
-       p.email,
        a.score,
        a.total,
        a.duration_ms,
@@ -192,6 +217,8 @@ $$
 declare
   v_name  text := btrim(regexp_replace(coalesce(p_name, ''), '\s+', ' ', 'g'));
   v_email text := lower(btrim(coalesce(p_email, '')));
+  v_key   text := coalesce(quiz.cfg('email_hmac_key'), '');
+  v_ehash text;
   v_token text := replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', '');
   v_hash  text := encode(sha256(convert_to(v_token, 'utf8')), 'hex');
   v_host  text := coalesce(quiz.cfg('host_code'), '');
@@ -203,15 +230,20 @@ begin
   if char_length(v_email) > 254 or v_email !~ '^[a-z0-9._%+''-]+@([a-z0-9-]+\.)*ibm\.com$' then
     raise exception 'invalid_email';
   end if;
+  if char_length(v_key) < 16 then
+    raise exception 'server_not_configured';
+  end if;
+  -- Keep only a keyed one-way hash of the email; the email itself is never stored.
+  v_ehash := encode(extensions.hmac(convert_to(v_email, 'utf8'), convert_to(v_key, 'utf8'), 'sha256'), 'hex');
 
   if coalesce(p_host_code, '') <> '' then
     -- host test run: reset any previous attempt, bypass the open/closed switch
     if char_length(v_host) < 8 or p_host_code is distinct from v_host then
       raise exception 'invalid_host_code';
     end if;
-    insert into quiz.participants as p (name, email, token_hash, is_test)
-    values (v_name, v_email, v_hash, true)
-    on conflict (email) do update
+    insert into quiz.participants as p (name, email_hash, token_hash, is_test)
+    values (v_name, v_ehash, v_hash, true)
+    on conflict (email_hash) do update
       set name = excluded.name, token_hash = excluded.token_hash, is_test = true
     returning p.id into v_id;
     delete from quiz.attempts where participant_id = v_id;
@@ -222,9 +254,9 @@ begin
     raise exception 'quiz_closed';
   end if;
 
-  insert into quiz.participants as p (name, email, token_hash)
-  values (v_name, v_email, v_hash)
-  on conflict (email) do update
+  insert into quiz.participants as p (name, email_hash, token_hash)
+  values (v_name, v_ehash, v_hash)
+  on conflict (email_hash) do update
     set name = excluded.name, token_hash = excluded.token_hash
     where not p.is_test
       and not exists (select 1 from quiz.attempts a where a.participant_id = p.id)
@@ -368,7 +400,7 @@ begin
 end;
 $$;
 
--- Public leaderboard: names and scores only, never emails.
+-- Public leaderboard: names and scores only.
 create or replace function public.quiz_leaderboard(p_limit int default 10)
 returns jsonb language sql stable security definer
 set search_path = quiz, pg_temp as
@@ -558,7 +590,7 @@ group by q.id, q.position, q.prompt, q.kind
 order by q.position;
 
 create or replace view quiz.v_unfinished as
-select p.name, p.email, a.started_at
+select p.name, a.started_at
 from quiz.attempts a
 join quiz.participants p on p.id = a.participant_id
 where a.submitted_at is null and not p.is_test
@@ -566,7 +598,7 @@ order by a.started_at;
 
 -- Workshop progress of real participants only (host test runs excluded), with the quiz result alongside.
 create or replace view quiz.v_workshop_real as
-select p.id as participant_id, p.name, p.email, w.path, cardinality(w.done) as steps_done, w.done,
+select p.id as participant_id, p.name, w.path, cardinality(w.done) as steps_done, w.done,
        w.started_at, w.updated_at, w.finished_at,
        a.score as quiz_score, a.total as quiz_total
 from quiz.workshop_progress w
