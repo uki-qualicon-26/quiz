@@ -247,6 +247,8 @@ begin
       set name = excluded.name, token_hash = excluded.token_hash, is_test = true
     returning p.id into v_id;
     delete from quiz.attempts where participant_id = v_id;
+    -- also reset the hands-on workshop (path, steps and the 20 minute clock) so a test run starts fresh
+    delete from quiz.workshop_progress where participant_id = v_id;
     return jsonb_build_object('token', v_token, 'name', v_name, 'is_test', true);
   end if;
 
