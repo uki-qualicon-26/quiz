@@ -228,5 +228,5 @@ a.btn { text-decoration: none; text-align: center; }
 .wrap:has(#view-register:not(.hidden)) { max-width: 1240px; }
 @supports selector(:has(*)) { @media (min-width: 1280px) { .privacy { white-space: nowrap; font-size: .8rem; } } }
 
-/* Quiz questions screen: moderately wider card (760px -> 960px) */
-.wrap:has(#view-quiz:not(.hidden)) { max-width: 960px; }
+/* Quiz questions and result screens: moderately wider card (760px -> 960px) */
+.wrap:has(#view-quiz:not(.hidden)), .wrap:has(#view-result:not(.hidden)) { max-width: 960px; }
