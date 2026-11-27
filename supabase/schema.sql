@@ -535,6 +535,41 @@ end;
 $$;
 
 -- -----------------------------------------------------------------------------
+-- Live numbers for the workshop big screen (workshop-live.html). Counts and the names typed at registration only:
+-- no emails or tokens. Host test runs are excluded.
+create or replace function public.workshop_stats()
+returns jsonb language sql stable security definer
+set search_path = quiz, pg_temp as
+$$
+  with r as (
+    select p.name, w.path, w.done, cardinality(w.done) as n, w.started_at, w.updated_at, w.finished_at
+    from quiz.workshop_progress w
+    join quiz.participants p on p.id = w.participant_id
+    where not p.is_test and w.path is not null
+  )
+  select jsonb_build_object(
+    'quiz_done', (select count(*) from quiz.attempts a join quiz.participants p on p.id = a.participant_id
+                  where not p.is_test and a.submitted_at is not null),
+    'started',   (select count(*) from r),
+    'finished',  (select count(*) from r where finished_at is not null),
+    'path_a',    (select count(*) from r where path = 'A'),
+    'path_b',    (select count(*) from r where path = 'B'),
+    'stalled',   (select count(*) from r where finished_at is null and updated_at < now() - interval '5 minutes'),
+    'steps',     (select coalesce(jsonb_object_agg(s, c), '{}'::jsonb)
+                  from (select x as s, count(*) as c from r, unnest(r.done) as x group by x) t),
+    'leaders',   (select coalesce(jsonb_agg(jsonb_build_object(
+                          'name', l.name, 'path', l.path,
+                          'seconds', round(extract(epoch from l.finished_at - l.started_at))::int)
+                        order by l.finished_at - l.started_at, l.name), '[]'::jsonb)
+                  from (select * from r where finished_at is not null
+                        order by finished_at - started_at, name limit 10) l),
+    'active',    (select coalesce(jsonb_agg(jsonb_build_object('name', a.name, 'path', a.path, 'steps_done', a.n)
+                        order by a.n desc, a.updated_at, a.name), '[]'::jsonb)
+                  from (select * from r where finished_at is null
+                        order by n desc, updated_at, name limit 10) a)
+  )
+$$;
+
 -- Privileges: the browser (anon) may only execute the quiz_* and workshop_* functions.
 -- -----------------------------------------------------------------------------
 do $$
@@ -544,7 +579,7 @@ begin
     'quiz_config()', 'quiz_register(text,text,text)', 'quiz_status(text)', 'quiz_start(text)',
     'quiz_submit(text,jsonb)', 'quiz_result(text)', 'quiz_leaderboard(int)', 'quiz_stats()',
     'quiz_host_reset(text,text)',
-    'workshop_get(text)', 'workshop_save(text,text,jsonb,boolean)'
+    'workshop_get(text)', 'workshop_save(text,text,jsonb,boolean)', 'workshop_stats()'
   ] loop
     execute format('revoke all on function public.%s from public', f);
     execute format('grant execute on function public.%s to anon, authenticated', f);
